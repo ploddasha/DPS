@@ -11,8 +11,14 @@ public class PrintStrRunnable implements Runnable{
     public void run() {
         while (!Thread.currentThread().isInterrupted()) {
             System.out.println(str);
+            try {
+                Thread.sleep(250);
+            } catch (InterruptedException e) {
+                System.out.println("Been interrupted in wait");
+                break;
+            }
         }
-        System.out.print("Finished");
+        System.out.println("Finished");
 
     }
 }
