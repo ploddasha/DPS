@@ -1,15 +1,18 @@
 package ru.nsu.plodushcheva;
 
 public class StringPrintRunnable implements Runnable{
-    private final String str;
+    private final String[] strs;
 
-    public StringPrintRunnable(String str) {
-        this.str = new String(str);
+    public StringPrintRunnable(String[] strs) {
+        this.strs = strs.clone();
     }
 
     @Override
     public void run() {
-        System.out.println(str);
+        for (String str : strs) {
+            System.out.print(str);
+        }
+        System.out.println();
     }
 
 }
