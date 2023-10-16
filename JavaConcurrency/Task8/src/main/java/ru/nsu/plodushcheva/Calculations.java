@@ -1,5 +1,8 @@
 package ru.nsu.plodushcheva;
 
+import sun.misc.Signal;
+import sun.misc.SignalHandler;
+import java.util.concurrent.Semaphore;
 
 public class Calculations {
 
@@ -22,7 +25,6 @@ public class Calculations {
         @Override
         public void run() {
             pi = new Pi();
-            //result += pi.calculatePiLeibniz(num, countOFThreads);
             pi.calculatePiLeibniz(num, countOFThreads);
         }
 
@@ -32,8 +34,7 @@ public class Calculations {
     }
 
 
-    public double piCalculate(int countOfThreads) {
-        double result = 0;
+    public void piCalculate(int countOfThreads) {
 
         ThreadForPi[] threads = new ThreadForPi[countOfThreads];
         for (int i = 0; i < countOfThreads; i++) {
@@ -41,15 +42,9 @@ public class Calculations {
             threads[i].start();
         }
 
-        try {
-            Thread.sleep(5000);
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-        }
-        //System.exit(0);
+        Semaphore semaphore = new Semaphore(0);
 
-
-        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+        SignalHandler signalHandler = signal -> {
             double res = 0.0;
             for (int i = 0; i < countOfThreads; i++) {
                 threads[i].stopping();
@@ -57,22 +52,17 @@ public class Calculations {
             }
             System.out.println("Received SIGINT. Terminating...");
             System.out.println("Pi = " + res);
-        }));
+            semaphore.release();
+        };
 
-        /*
-        for (int i = 0; i < countOfThreads; i++) {
-            threads[i].stopping();
-            result += threads[i].getResult();
-        } */
+        Signal.handle(new Signal("INT"), signalHandler);
 
-        for (int i = 0; i < countOfThreads; i++) {
-            //threads[i].join();
-            //result += threads[i].getResult();
-            threads[i].interrupt();
+        try {
+            semaphore.acquire();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
         }
-
-        return result;
     }
 
-
 }
+

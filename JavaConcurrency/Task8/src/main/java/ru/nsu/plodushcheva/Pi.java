@@ -3,6 +3,9 @@ package ru.nsu.plodushcheva;
 public class Pi {
     private boolean workFlag = true;
     private volatile double pi = 0.0;
+    private final Object lock = new Object();
+
+
 
     public void calculatePiLeibniz(int threadId, int countOfThreads) {
 
@@ -14,20 +17,25 @@ public class Pi {
             int denominator = 2 * i + 1;
             double term = 1.0 / denominator;
 
-            if (subtract) {
-                pi -= term;
-            } else {
-                pi += term;
+            synchronized (lock) {
+                if (subtract) {
+                    pi -= term;
+                } else {
+                    pi += term;
+                }
             }
             subtract = !subtract;
             i += countOfThreads;
         }
-        System.out.println(pi * 4);
     }
 
     public double stop() {
         workFlag = false;
-        System.out.println(pi * 4);
-        return pi * 4;
+        double result;
+        synchronized (lock) {
+            result = pi * 4;
+        }
+        System.out.println("step = " + result);
+        return result;
     }
 }
