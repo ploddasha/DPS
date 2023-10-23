@@ -13,12 +13,14 @@ public class Main {
                         while (flag[0] == 0) {
                             lock.wait();
                         }
-                        System.out.println("Line from child");
-                        flag[0] = 0;
-                        lock.notify();
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
+                }
+                System.out.println("Line from child");
+                synchronized (lock) {
+                    flag[0] = 0;
+                    lock.notify();
                 }
             }
         });
@@ -31,12 +33,14 @@ public class Main {
                     while (flag[0] == 1) {
                         lock.wait();
                     }
-                    System.out.println("Line from parent");
-                    flag[0] = 1;
-                    lock.notify();
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
+            }
+            System.out.println("Line from parent");
+            synchronized (lock) {
+                flag[0] = 1;
+                lock.notify();
             }
         }
 
