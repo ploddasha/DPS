@@ -59,9 +59,8 @@ public class Philosopher implements Runnable{
                     continue;
                 }
                 doAction("Picked up right fork");
-
             } catch (InterruptedException e) {
-                System.out.println("Something happened to philosopher " + id);
+                System.err.println("Error with philosopher " + id);
             } finally {
                 forks.unlock();
             }
@@ -79,11 +78,10 @@ public class Philosopher implements Runnable{
                 condition.signalAll();
 
             } catch (InterruptedException e) {
-                System.out.println("something happened to philosopher $id");
+                System.err.println("Error with philosopher" + id);
             } finally {
                 forks.unlock();
             }
-
         }
     }
 }
