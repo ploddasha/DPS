@@ -20,7 +20,6 @@ public class Main {
         for (int i = 0; i < countOfPhilosophers; i++) {
             Lock leftFork = forks[i];
             Lock rightFork = forks[(i + 1) % forks.length];
-
             philosophers.add(new Thread(new Philosopher(i + 1, leftFork, rightFork, lock, condition)));
         }
         philosophers.forEach(Thread::start);

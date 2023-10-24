@@ -49,17 +49,17 @@ public class Philosopher implements Runnable{
 
             forks.lock();
             try {
-                if (leftFork.tryLock()) {
-                    doAction("Picked up left fork");
-                    if (rightFork.tryLock()) {
-                        doAction("Picked up right fork");
-                    } else {
-                        leftFork.unlock();
-                        continue;
-                    }
-                } else {
+                while (!leftFork.tryLock()) {
+                    condition.await();
+                }
+                doAction("Picked up left fork");
+                if (!rightFork.tryLock()) {
+                    leftFork.unlock();
+                    condition.await();
                     continue;
                 }
+                doAction("Picked up right fork");
+
             } catch (InterruptedException e) {
                 System.out.println("Something happened to philosopher " + id);
             } finally {
