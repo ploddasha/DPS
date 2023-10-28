@@ -4,13 +4,13 @@ public class Main {
 
     public static void main(String[] args) {
         final Object lock = new Object();
-        final int[] flag = {0};
+        final boolean[] flag = {false};
 
         Thread childThread = new Thread(() -> {
             for (int i = 0; i < 10; i++) {
                 synchronized (lock) {
                     try {
-                        while (flag[0] == 0) {
+                        while (!flag[0]) {
                             lock.wait();
                         }
                     } catch (InterruptedException e) {
@@ -19,7 +19,7 @@ public class Main {
                 }
                 System.out.println("Line from child");
                 synchronized (lock) {
-                    flag[0] = 0;
+                    flag[0] = false;
                     lock.notify();
                 }
             }
@@ -30,7 +30,7 @@ public class Main {
         for (int i = 0; i < 10; i++) {
             synchronized (lock) {
                 try {
-                    while (flag[0] == 1) {
+                    while (flag[0]) {
                         lock.wait();
                     }
                 } catch (InterruptedException e) {
@@ -39,7 +39,7 @@ public class Main {
             }
             System.out.println("Line from parent");
             synchronized (lock) {
-                flag[0] = 1;
+                flag[0] = true;
                 lock.notify();
             }
         }
