@@ -9,13 +9,12 @@ public class Main {
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
         int threadsCount = scanner.nextInt();
-        int seconds = scanner.nextInt();
 
         Calculations calculations = new Calculations();
 
         new Thread(() -> {
             try {
-                Thread.sleep(seconds * 1000);
+                Thread.sleep(100);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }

@@ -3,54 +3,41 @@ package ru.nsu.plodushcheva;
 import sun.misc.Signal;
 import sun.misc.SignalHandler;
 import java.util.concurrent.Semaphore;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class Calculations {
 
-    public static class ThreadForPi extends Thread {
-        private final int countOFThreads;
-        private final int num;
-        private double result = 0.0;
-        private Pi pi;
-
-
-        public ThreadForPi(int num, int countOFThreads) {
-            this.num = num;
-            this.countOFThreads = countOFThreads;
-        }
-
-        public double getResult() {
-            return result;
-        }
-
-        @Override
-        public void run() {
-            pi = new Pi();
-            pi.calculatePiLeibniz(num, countOFThreads);
-        }
-
-        public void stopping() {
-            result += pi.stop();
-        }
-    }
-
+    static AtomicInteger atomicInt = new AtomicInteger(100000000);
 
     public void piCalculate(int countOfThreads) {
 
-        ThreadForPi[] threads = new ThreadForPi[countOfThreads];
+        Pi[] threads = new Pi[countOfThreads];
         for (int i = 0; i < countOfThreads; i++) {
-            threads[i] = new ThreadForPi(i, countOfThreads);
+            threads[i] = new Pi(atomicInt, i, countOfThreads);
             threads[i].start();
         }
 
         Semaphore semaphore = new Semaphore(0);
 
         SignalHandler signalHandler = signal -> {
-            double res = 0.0;
-            for (int i = 0; i < countOfThreads; i++) {
-                threads[i].stopping();
-                res += threads[i].getResult();
+            int maxIteration = 0;
+            for (Pi thread : threads) {
+                int iteration = thread.getIteration();
+                if (iteration > maxIteration) {
+                    maxIteration = iteration;
+                }
             }
-            System.out.println("Received SIGINT. Terminating...");
+
+            for (Pi thread : threads) {
+                thread.setMaxIterations(maxIteration);
+            }
+
+            double res = 0.0;
+            for (Pi thread : threads) {
+                res += thread.getResult();
+            }
+
+            System.out.println("Received SIGINT");
             System.out.println("Pi = " + res);
             semaphore.release();
         };
