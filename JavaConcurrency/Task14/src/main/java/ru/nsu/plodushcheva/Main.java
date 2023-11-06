@@ -4,8 +4,8 @@ import java.util.concurrent.Semaphore;
 
 public class Main {
     public static void main(String[] args) {
-        Semaphore[] semaphores = new Semaphore[3];
-        for (int i = 0; i < 3; i++) {
+        Semaphore[] semaphores = new Semaphore[4];
+        for (int i = 0; i < 4; i++) {
             semaphores[i] = new Semaphore(0);
         }
 
@@ -18,6 +18,5 @@ public class Main {
             threads[i] = new Thread(conveyors[i]);
             threads[i].start();
         }
-
     }
 }
