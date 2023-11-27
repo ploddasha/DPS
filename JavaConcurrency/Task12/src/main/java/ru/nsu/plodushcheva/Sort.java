@@ -3,11 +3,11 @@ package ru.nsu.plodushcheva;
 import java.util.*;
 
 public class Sort implements Runnable{
-    static List<String> list;
-    Object listLock;
+    private final List<String> list;
+    private final Object listLock;
 
     public Sort(List<String> list, Object listLock) {
-        Sort.list = list;
+        this.list = list;
         this.listLock = listLock;
     }
 
@@ -19,11 +19,13 @@ public class Sort implements Runnable{
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);
             }
-            bubbleSort();
+            synchronized (listLock) {
+                bubbleSort();
+            }
         }
     }
 
-    public static void bubbleSort() {
+    private void bubbleSort() {
         int n = list.size();
         boolean swapped;
         ListIterator<String> iterator1;
