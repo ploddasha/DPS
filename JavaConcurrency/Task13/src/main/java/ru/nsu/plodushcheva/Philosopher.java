@@ -49,8 +49,9 @@ public class Philosopher implements Runnable{
 
             forks.lock();
             try {
-                while (!leftFork.tryLock()) {
+                if (!leftFork.tryLock()) {
                     condition.await();
+                    continue;
                 }
                 doAction("Picked up left fork");
                 if (!rightFork.tryLock()) {
