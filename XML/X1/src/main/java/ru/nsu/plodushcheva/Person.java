@@ -1,6 +1,7 @@
 package ru.nsu.plodushcheva;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class Person {
     public String getId() {
@@ -50,6 +51,14 @@ public class Person {
     public void addParent(String personId) {
         addParent(new Person(personId));
     }
+
+    public void addParent(String[] name, String gender) {
+        Person parent = new Person();
+        parent.setFirstName(name[0]);
+        parent.setLastName(name[1]);
+        parent.setGender(gender);
+        addParent(parent);
+    }
     public void addParent(Person newParent) {
         if (parents.stream().noneMatch(parent ->
                 Objects.equals(parent.getId(), newParent.getId()))
@@ -64,6 +73,10 @@ public class Person {
 
     public Integer getChildrenCount() {
         return childrenCount;
+    }
+
+    public void cleanParents() {
+        parents = parents.stream().distinct().toList();
     }
 
     public void setChildrenCount(Integer childrenCount) {
@@ -191,6 +204,8 @@ public class Person {
     }
 
     public boolean check() {
+
+
         if (this.spouse == this) {return false;}
         if (this.children.contains(this)) {
             return false;
@@ -207,6 +222,17 @@ public class Person {
             }
         }
         return true;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Person person = (Person) o;
+        //if (this.id != null && person.id != null && this.id.equals(person.id))
+            //return true;
+        //return this.getFirstName() != null && person.getFirstName() != null && this.getFirstName().equals(person.getFirstName());
+        return this.id != null && person.id != null && this.id.equals(person.id);
     }
 
 }

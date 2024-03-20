@@ -5,6 +5,7 @@ import java.util.*;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import ru.nsu.plodushcheva.schema.PeopleWrapper;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -13,6 +14,8 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.transform.*;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
+
+import javax.xml.bind.*;
 
 public class Main {
     public static void main(String[] args){
@@ -59,6 +62,12 @@ public class Main {
         }
         System.out.println("withoutIds" + withoutIds.size());
 
+        for (Person person : ids.values()) {
+            if (person.getParents().size() > 1) {
+                person.cleanParents();
+            }
+        }
+
         List<Person> failedCheck = new ArrayList<>();
         for (Person person : ids.values()) {
             if (!person.check()) {
@@ -70,6 +79,24 @@ public class Main {
 
         return new ArrayList<>(ids.values());
     }
+
+
+    /*
+    private static void writeFile(List<Person> people) {
+        try {
+            JAXBContext context = JAXBContext.newInstance(Person.class);
+            Marshaller marshaller = context.createMarshaller();
+            marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
+
+            PeopleWrapper wrapper = new PeopleWrapper();
+            wrapper.setPeople(people);
+
+            marshaller.marshal(wrapper, new File("peopleNew2.xml"));
+        } catch (JAXBException e) {
+            e.printStackTrace();
+        }
+    } */
+
 
 
     private static void writeFile(List<Person> people) {
@@ -127,8 +154,7 @@ public class Main {
 
         // Add gender element
         Element genderElement = doc.createElement("gender");
-        genderElement.appendChild(doc.createTextNode(person.getGender() != null
-                ? person.getGender() : "unknown"));
+        genderElement.appendChild(doc.createTextNode(person.getGender() != null ? person.getGender() : ""));
         personElement.appendChild(genderElement);
 
         // Add first name element
@@ -141,9 +167,9 @@ public class Main {
         lastNameElement.appendChild(doc.createTextNode(person.getLastName()));
         personElement.appendChild(lastNameElement);
 
-        // Add wife element
+        // Add spouse element
         String tag = "spouse";
-        String id = "unknown";
+        String id = "";
         if (person.getSpouse() != null) {
             if (Objects.equals(person.getSpouse().getGender(), "female")) {
                 tag = "wife";
@@ -207,6 +233,7 @@ public class Main {
 
         return personElement;
     }
+
 
 
 }

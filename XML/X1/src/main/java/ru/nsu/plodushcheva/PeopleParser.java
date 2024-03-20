@@ -124,6 +124,20 @@ public class PeopleParser {
                             person.addParent(parentValue.getValue());
                         }
                         break;
+                    case "mother":
+                        event = reader.nextEvent();
+                        String[] mother = event.asCharacters().getData().trim().split("\\s+");
+                        if (person != null) {
+                            person.addParent(mother, "female");
+                        }
+                        break;
+                    case "father":
+                        event = reader.nextEvent();
+                        String[] father = event.asCharacters().getData().trim().split("\\s+");
+                        if (person != null) {
+                            person.addParent(father, "male");
+                        }
+                        break;
                     case "children-number":
                         Attribute childrenValue = startElement.getAttributeByName(new QName("value"));
                         if (childrenValue != null && person != null) {
