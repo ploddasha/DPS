@@ -20,14 +20,7 @@
     <xs:choice maxOccurs="unbounded" minOccurs="0">
       <xs:element type="xs:string" name="sister"/>
       <xs:element type="xs:string" name="brother"/>
-      <xs:element name="sibling">
-        <xs:simpleType>
-          <xs:restriction base="xs:string">
-            <xs:enumeration value="P385164"/>
-            <xs:enumeration value=""/>
-          </xs:restriction>
-        </xs:simpleType>
-      </xs:element>
+      <xs:element type="xs:string" name="sibling"/>
     </xs:choice>
     <xs:attribute type="xs:string" name="count" use="optional"/>
   </xs:complexType>

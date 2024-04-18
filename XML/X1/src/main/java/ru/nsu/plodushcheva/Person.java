@@ -77,6 +77,11 @@ public class Person {
 
     public void cleanParents() {
         parents = parents.stream().distinct().toList();
+        if (parents.size() == 2) {
+            if (Objects.equals(parents.get(0).getGender(), parents.get(1).getGender())) {
+                parents.remove(1);
+            }
+        }
     }
 
     public void setChildrenCount(Integer childrenCount) {
