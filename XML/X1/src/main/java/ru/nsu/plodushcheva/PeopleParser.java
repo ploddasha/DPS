@@ -186,10 +186,6 @@ public class PeopleParser {
                         }
                         break;
                 }
-                if (event.isStartElement()) {
-                    System.out.println( "tag: " + event.asStartElement().getName());
-                }
-
             }
             else if (event.isEndElement()) {
                 EndElement endElement = event.asEndElement();
@@ -202,12 +198,9 @@ public class PeopleParser {
                     personsData.addAll(person.getSiblings());
                     personsData.addAll(person.getParents());
                     person = null;
-                    if (event.isEndElement()) {
-                        System.out.println( "tagE: " + event.asEndElement().getName());
-                    }
                 }
                 if (endElement.getName().getLocalPart().equals("people")) {
-                    System.out.println("read xml file");
+                    System.out.println("Finished reading xml file");
                     return personsData;
                 }
             }

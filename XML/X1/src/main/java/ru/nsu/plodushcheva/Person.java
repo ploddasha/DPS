@@ -1,7 +1,6 @@
 package ru.nsu.plodushcheva;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 public class Person {
     public String getId() {
@@ -125,7 +124,6 @@ public class Person {
         this.id = id;
     }
 
-    //siblings
     public void addSibling(Person newSibling) {
         if (newSibling.siblingsCount == null) newSibling.siblingsCount = siblingsCount;
         if (siblingsCount == null) siblingsCount = newSibling.siblingsCount;
@@ -209,8 +207,6 @@ public class Person {
     }
 
     public boolean check() {
-
-
         if (this.spouse == this) {return false;}
         if (this.children.contains(this)) {
             return false;
@@ -234,9 +230,6 @@ public class Person {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Person person = (Person) o;
-        //if (this.id != null && person.id != null && this.id.equals(person.id))
-            //return true;
-        //return this.getFirstName() != null && person.getFirstName() != null && this.getFirstName().equals(person.getFirstName());
         return this.id != null && person.id != null && this.id.equals(person.id);
     }
 
