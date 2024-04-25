@@ -2,7 +2,13 @@ package ru.nsu.plodushcheva;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import ru.nsu.plodushcheva.schema.*;
 
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBElement;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Marshaller;
+import javax.xml.namespace.QName;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -12,14 +18,108 @@ import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
+import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 
 public class FileWriter {
 
+
+    static void writeFile(List<Person> people) {
+        PeopleType peopleObj = new PeopleType();
+        for (Person person : people) {
+            PersonType personType = convertToPersonType(person);
+            peopleObj.getPerson().add(personType);
+        }
+        try {
+            JAXBContext context = JAXBContext.newInstance(PeopleType.class);
+            Marshaller marshaller = context.createMarshaller();
+            marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
+            marshaller.marshal(peopleObj, new File("peopleNew.xml"));
+        } catch (JAXBException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private static PersonType convertToPersonType(Person person) {
+        PersonType personType = new PersonType();
+
+        personType.setId(person.getId());
+        personType.setGender(person.getGender() != null ? person.getGender() : "");
+        personType.setFirst(person.getFirstName());
+        personType.setLast(person.getLastName());
+
+        if (person.getSpouse() != null) {
+            if (Objects.equals(person.getSpouse().getGender(), "female")) {
+                personType.setWife(person.getSpouse().getId());
+            } else if (Objects.equals(person.getSpouse().getGender(), "male")) {
+                personType.setHusband(person.getSpouse().getId());
+            } else {
+                personType.setSpouse(person.getSpouse().getId());
+            }
+        }
+
+        personType.setParents(convertToParentsType(person.getParents()));
+        personType.setChildren(convertToChildrenType(person.getChildren()));
+        personType.setSiblings(convertToSiblingsType(person.getSiblings()));
+
+        return personType;
+    }
+
+    private static ParentsType convertToParentsType(List<Person> parents) {
+        ParentsType parentsType = new ParentsType();
+        parentsType.setCount(String.valueOf(parents.size()));
+        for (Person parent : parents) {
+            JAXBElement<String> parentElement;
+            if (Objects.equals(parent.getGender(), "female")) {
+                parentElement = new JAXBElement<>(new QName("mother"), String.class, parent.getId());
+            } else {
+                parentElement = new JAXBElement<>(new QName("father"), String.class, parent.getId());
+            }
+            parentsType.getContent().add(parentElement);
+        }
+        return parentsType;
+    }
+
+    private static ChildrenType convertToChildrenType(Set<Person> children) {
+        ChildrenType childrenType = new ChildrenType();
+        childrenType.setCount(String.valueOf(children.size()));
+        for (Person child : children) {
+            JAXBElement<String> childElement;
+            if (Objects.equals(child.getGender(), "male")) {
+                childElement = new JAXBElement<>(new QName("son"), String.class, child.getId());
+            } else if (Objects.equals(child.getGender(), "female")) {
+                childElement = new JAXBElement<>(new QName("daughter"), String.class, child.getId());
+            } else {
+                childElement = new JAXBElement<>(new QName("child"), String.class, child.getId());
+            }
+            childrenType.getContent().add(childElement);
+        }
+        return childrenType;
+    }
+
+    private static SiblingsType convertToSiblingsType(Set<Person> siblings) {
+        SiblingsType siblingsType = new SiblingsType();
+        siblingsType.setCount(String.valueOf(siblings.size()));
+        for (Person sibling : siblings) {
+            JAXBElement<String> siblingElement;
+            if (Objects.equals(sibling.getGender(), "male")) {
+                siblingElement = new JAXBElement<>(new QName("brother"), String.class, sibling.getId());
+            } else if (Objects.equals(sibling.getGender(), "female")) {
+                siblingElement = new JAXBElement<>(new QName("sister"), String.class, sibling.getId());
+            } else {
+                siblingElement = new JAXBElement<>(new QName("sibling"), String.class, sibling.getId());
+            }
+            siblingsType.getContent().add(siblingElement);
+        }
+        return siblingsType;
+    }
+
+    /*
     static void writeFile(List<Person> people) {
         DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
         DocumentBuilder docBuilder;
@@ -154,6 +254,8 @@ public class FileWriter {
 
         return personElement;
     }
+
+    */
 
 
 }
