@@ -15,13 +15,13 @@ public class CitiesController {
     private CityService cityService;
 
     @GetMapping
-    public List<City> getAllCities(@RequestParam("locale") String locale) {
+    public List<City> getAllCities(@RequestParam(value = "locale", required = false, defaultValue = "en") String locale) {
         return cityService.getAllCities(locale);
     }
 
     @GetMapping("/{city}/airports")
-    public List<Airport> airports(@PathVariable("city") String city) {
-        return null;
+    public List<Airport> getAirportsForCity(@PathVariable("city") String city, @RequestParam(value = "locale", required = false, defaultValue = "en") String locale) {
+        return cityService.getAirportsForCity(locale, city);
     }
 
 }

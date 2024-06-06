@@ -1,42 +1,24 @@
 package com.example.demo.model;
 
-import jakarta.persistence.ElementCollection;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-
 import java.util.List;
 
-@Entity
-public class Booking {
+public class SelectedRoute {
 
-    @Id
-    private String bookRef;
     private String departureAirport;
     private String arrivalAirport;
-    @ElementCollection
     private List<String> flightPath;
     private String scheduledDeparture;
     private String scheduledArrival;
-    @ElementCollection
     private List<Integer> flightNumbers;
-    @ElementCollection
     private List<String> departures;
-    @ElementCollection
     private List<String> arrivals;
+
     private int price;
     private String fareConditions;
     private String passengerName;
     private String contactData;
 
     // Getters and setters
-    public String getBookRef() {
-        return bookRef;
-    }
-
-    public void setBookRef(String bookRef) {
-        this.bookRef = bookRef;
-    }
-
     public String getDepartureAirport() {
         return departureAirport;
     }
