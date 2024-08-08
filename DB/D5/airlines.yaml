@@ -1,0 +1,524 @@
+openapi: 3.0.0
+info: 
+  title: Airlines
+  description: Design of the RESTful web service, API specification
+  version: 0.0.1
+  
+servers:
+  - url: https://localhost:8080/api
+    description: server
+  
+tags:
+    - name: cities
+      description: Cities with airports
+    - name: airports
+      description: Airports and operations with its
+    - name: routes
+      description: Connecting two points (airport or city)
+    - name: bookings
+      description: One of the Economy, Comfort, Business
+    - name: checkings
+      description: Online checkin for a flight
+      
+# дата формат timestamp
+# поинт - город или аэропорт и количество , с пересадками
+# добавить flight_no и в целом и возвращается номер бронирования - шестисимвольное слово
+# checkin - передаем bookref , return boarding pass ans seats
+# bookref на роут
+paths:
+  /cities:
+    get:
+      summary: All the available source and destination cities
+      tags:
+        - cities
+      parameters:
+        - in: query
+          name: locale
+          schema:
+            type: string
+          description: The language
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Cities"
+              example:
+                [Anapa]
+        'default':
+          description: Not OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /cities/{city}/airports:
+    get:
+      summary: List of the airports within a city
+      tags:
+        - cities
+      parameters: 
+        - name: city
+          in: path
+          required: true
+          description: Name of the city
+          schema: 
+            type: string
+            example: Anapa
+        - in: query
+          name: locale
+          schema:
+            type: string
+          description: The language
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Airports"
+              example:
+                [
+                  {
+                    code: AAQ,
+                    name: Anapa Vityazevo Airport,
+                    city: Anapa,
+                    coordinates: (37.347301483154,45.002101898193),
+                    timezone: Europe/Moscow
+                  }
+                ]
+        'default':
+          description: Not OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /airports:
+    get:
+      summary: All the available source and destination airports
+      tags:
+        - airports
+      parameters:
+        - in: query
+          name: locale
+          schema:
+            type: string
+          description: The language
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Airports"
+              example:
+                [
+                  {
+                    code: AAQ,
+                    name: Anapa Vityazevo Airport,
+                    city: Anapa,
+                    coordinates: (37.347301483154,45.002101898193),
+                    timezone: Europe/Moscow
+                  }
+                ]
+        'default':
+          description: Not OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /airports/{airport}/schedules/inbound:
+    get:
+      summary: List the inbound schedule for an airport 
+      tags:
+        - airports
+      parameters: 
+        - name: airport
+          in: path
+          required: true
+          description: Code of the airport
+          schema: 
+            type: string
+            example: AAQ
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/InboundSchedule"
+              example:
+                [
+                  {
+                    daysOfWeek: [1, 2, 6],
+                    timeOfArrival: "2017-07-16 13:35:00+07",
+                    flightNo: "PG0405",
+                    origin: "DME"
+                  }
+                ]
+        'default':
+          description: Not OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /airports/{airport}/schedules/outbound:
+    get:
+      summary: List the outbound schedule for an airport 
+      tags:
+        - airports
+      parameters: 
+        - name: airport
+          in: path
+          required: true
+          description: Code of the airport
+          schema: 
+            type: string
+            example: AAQ
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OutboundSchedule"
+              example:
+                [
+                  {
+                    daysOfWeek: [1, 2, 6],
+                    timeOfDeparture: "2017-07-16 13:35:00+07",
+                    flightNo: "PG0405",
+                    destination: "DME"
+                  }
+                ]
+        'default':
+          description: Not OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /routes:
+    get:
+      summary: List the routes connecting two points
+      tags:
+        - routes
+      parameters:
+        - in: query
+          name: departureDate
+          required: true
+          schema:
+            type: string
+            example: 2017-08-05
+          description: Departure date limits the flights by the ones departing between 0:00:00 of the specified date and 0:0 :00 of the next date
+        - in: query
+          name: departurePoint
+          required: true
+          schema:
+            type: string
+            example: DME
+          description: Depatrure city or airport
+        - in: query
+          name: arrivalPoint
+          required: true
+          schema:
+            type: string
+            example: Moscow
+          description: Arraival city or airport
+        - in: query
+          name: bookingClass
+          schema:
+            type: string
+            example: Economy
+          description: Economy, Business or Comfort
+        - in: query
+          name: limit
+          schema:
+            type: string
+            example: 0
+          description: Limits the number of connections 0 (direct), 1, 2, 3, unbound
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Routes"
+              example:
+                [
+                  {
+                    departureAirport: "DME",
+                    arrivalAirport: "LED",
+                    flightPath: ["Novosibirsk"],
+                    scheduledDeparture: "2017-09-09 16:25:00+07",
+                    scheduledArrival: "2017-08-16 16:20:00+07",
+                    flightNumbers: [PG0405],
+                    departures: ["DME"],
+                    arrivals: ["LED"],
+                    price: 50000
+                  }
+                ]
+
+        'default':
+          description: Not OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /bookings:
+    post:
+      summary: Create a booking for a selected route for a single passenger
+      tags: 
+        - bookings
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SelectedRoute'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Booking"
+              example:
+                {
+                  bookRef: 000012
+                }
+        'default':
+          description: Not OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /checkins/{bookRef}:
+    get:
+      summary: Create online check-in for a flight
+      tags: 
+        - checkins
+      parameters: 
+        - name: bookRef
+          in: path
+          required: true
+          description: Booking number
+          schema: 
+            type: string
+            example: 000012
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BoardingPasses"
+        'default':
+          description: Not OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+components:
+  schemas:
+  
+    Error:
+      type: object
+      required: 
+        - code
+        - message
+      properties:
+        code:
+          type: integer
+        message:
+          type: string
+          
+    City:
+      type: string
+      
+    Cities:
+      type: array
+      items:
+        $ref: "#/components/schemas/City"
+        
+    Airport:
+      type: object
+      properties:
+        code:
+          type: string
+        name:
+          type: string
+        city:
+          type: string
+        coordinates:
+          type: string
+        timezome:
+          type: string
+      required:
+        - code
+        - name
+    
+    Airports:
+      type: array
+      items:
+        $ref: "#/components/schemas/Airport"
+        
+    InboundSchedule:
+      type: object
+      properties:
+        daysOfWeek:
+          type: array
+          items:
+            type: integer
+        timeOfArrival:
+          type: string
+        flightNo:
+          type: string
+        origin:
+          type: string
+      required:
+        - daysOfWeek
+        - timeOfArrival
+        - flightNo
+        - origin
+        
+    OutboundSchedule:
+      type: object
+      properties:
+        daysOfWeek:
+          type: array
+          items:
+            type: integer
+        timeOfDeparture:
+          type: string
+        flightNo:
+          type: string
+        destination:
+          type: string
+      required:
+        - daysOfWeek
+        - timeOfDeparture
+        - flightNo
+        - destination
+        
+        
+    Route:
+      type: object
+      properties:
+        departureAirport:
+          type: string
+        arrivalAirport:
+          type: string
+        flightPath:
+          type: array
+          items: 
+            type: string
+        scheduledDeparture:
+          type: string
+        scheduledArrival:
+          type: string
+        flightNumbers:
+          type: array
+          items:
+            type: integer
+        departures:
+          type: array
+          items: 
+            type: string
+        arrivals:
+          type: array
+          items: 
+            type: string
+        price:
+          type: integer
+      required:
+        - departureAirport
+        - arrivalAirport
+        - flightPath
+        
+    SelectedRoute:
+      type: object
+      properties:
+        departureAirport:
+          type: string
+        arrivalAirport:
+          type: string
+        flightPath:
+          type: array
+          items: 
+            type: string
+        scheduledDeparture:
+          type: string
+        scheduledArrival:
+          type: string
+        flightNumbers:
+          type: array
+          items:
+            type: integer
+        departures:
+          type: array
+          items: 
+            type: string
+        arrivals:
+          type: array
+          items: 
+            type: string
+        price:
+          type: integer
+        fareConditions:
+          type: string
+        passengerName:
+          type: string
+        contactData:
+          type: string
+      required:
+        - departureAirport
+        - arrivalAirport
+        - flightPath
+
+    Routes:
+      type: array
+      items:
+        $ref: "#/components/schemas/Route"
+    
+    Booking:
+      type: object
+      properties:
+        bookRef:
+          type: string
+      required:
+        - bookRef
+
+    BoardingPass:
+      type: object
+      properties:
+        ticketNo:
+          type: integer
+        flightId:
+          type: string
+        boardingNo:
+          type: integer
+        seatNo:
+          type: string
+        passengerName:
+          type: string
+      required:
+        - ticketNo
+        - flightId
+        - boardingNo
+        - seatNo
+        - passengerName
+    
+    BoardingPasses:
+      type: array
+      items:
+        $ref: "#/components/schemas/BoardingPass"
+
+
+ 
+  
+  
+  
+  
+  
+  
