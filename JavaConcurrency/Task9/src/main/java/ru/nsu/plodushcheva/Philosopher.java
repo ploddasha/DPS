@@ -5,6 +5,11 @@ public class Philosopher implements Runnable{
     private final Object leftFork;
     private final Object rightFork;
 
+    private static final int MAX_EATING_TIME = 2000; // in milliseconds
+    private static final int MAX_THINKING_TIME = 200; // in milliseconds
+    private static final int ACTION_TIME = 100; // in milliseconds
+
+
     public Philosopher(int id, Object leftFork, Object rightFork) {
         this.id = id;
         this.leftFork = leftFork;
@@ -13,7 +18,7 @@ public class Philosopher implements Runnable{
 
     private void eat() {
         System.out.println("Philosopher " + id + ": Eating");
-        long eating = (long) (Math.random() * 2000);
+        long eating = (long) (Math.random() * MAX_EATING_TIME);
         try {
             Thread.sleep(eating);
         } catch (InterruptedException e) {
@@ -24,7 +29,7 @@ public class Philosopher implements Runnable{
     private void think() {
         System.out.println("Philosopher " + id + ": Thinking");
         try {
-            Thread.sleep((long) (Math.random() * 200));
+            Thread.sleep((long) (Math.random() * MAX_THINKING_TIME));
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
@@ -32,7 +37,7 @@ public class Philosopher implements Runnable{
 
     private void doAction(String action) throws InterruptedException {
         System.out.println("Philosopher " + id + ": " + action);
-        Thread.sleep(((int) (Math.random() * 100)));
+        Thread.sleep(((int) (Math.random() * ACTION_TIME)));
     }
 
     @Override
