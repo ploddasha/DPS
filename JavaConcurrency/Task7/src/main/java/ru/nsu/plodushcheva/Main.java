@@ -8,13 +8,10 @@ public class Main {
         Scanner scanner = new Scanner(System.in);
         int threadsCount = scanner.nextInt();
 
-        int iterationsCount = 1000;
-        if (args.length > 1) {
-            iterationsCount = Integer.parseInt(args[0]);
-        }
+        final int ITERATIONS_COUNT = 1000;
 
         Calculations calculations = new Calculations();
-        double result = calculations.piCalculate(threadsCount, iterationsCount);
+        double result = calculations.piCalculate(threadsCount, ITERATIONS_COUNT);
         System.out.println("Pi = " + result);
     }
 }
